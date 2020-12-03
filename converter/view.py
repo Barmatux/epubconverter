@@ -12,7 +12,7 @@ def upload_page():
         url = request.form.get('url')
         if file and allowed_file(file.filename):
             file_name = create_epub(file)
-        elif url and allowed_file():
+        elif url and allowed_file(url):
             file_name = create_epub(url)
         else:
             return redirect('/exception')
