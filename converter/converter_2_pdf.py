@@ -1,34 +1,43 @@
-import pypandoc
-import urllib
 import os
-import time
+import tempfile
+import urllib
+import urllib.parse
+import pypandoc
+from converter.app import flask_app
 
 
-class Converter:
-
-    def _write_on_disk(self, address: str):
-        """Writing file from address to disk"""
-        test = os.path.join(os.getcwd(), address.split('/')[-1])
-        urllib.request.urlretrieve(address, test)
-        return test
-
-
-    def _make_output_file_name(self, address: str) -> str:
-        """Creating the same name as input file, but with .epub suffix"""
-        return address.replace(address[-2:], 'epub')
-
-    def convert(self, address: str) -> None:
-        """ Return new file name"""
-        if address.startswith('https://'):
-            address = self._write_on_disk(address)
-        pypandoc.convert_file(address, 'epub', outputfile=self._make_output_file_name(address))
-        os.remove(address)
+def read_stream(path):
+    """Return stream for writing"""
+    if isinstance(path, str):
+        with urllib.request.urlopen(path) as file:
+            return file.read()
+    else:
+        return path.stream.read()
 
 
+def create_epub(path_to_file: str) -> str:
+    """Creating epub file"""
+    with tempfile.NamedTemporaryFile(dir=flask_app.config['UPLOAD_FOLDER'], suffix='.md') as tmp:
+        tmp.write(read_stream(path_to_file))
+        tmp.seek(0)
+        file_name = convert(tmp.name, path_to_file)
+    return file_name
 
 
-if __name__ == '__main__':
-    c = Converter()
-    c.convert('https://github.com/awsdocs/amazon-athena-user-guide/blob/main/CODE_OF_CONDUCT.md')
+def change_name(path_to_file):
+    """Return original name of the file"""
+    if isinstance(path_to_file, str):
+        split_url = urllib.parse.urlsplit(path_to_file)
+        origin_file_name = split_url.path.split('/')[-1]
+        return origin_file_name.replace(origin_file_name.split('.')[-1], 'epub')
+    else:
+        or_file_name = os.path.split(path_to_file.filename)[-1]
+        return or_file_name.replace(or_file_name.split('.')[-1], 'epub')
 
-    # pypandoc.convert_file(r'D:\JetBrains\PyCharm Community Edition 2020.2.3\jbr\bin\CODE_OF_CONDUCT.md', 'epub', outputfile=r'D:\JetBrains\PyCharm Community Edition 2020.2.3\jbr\bin\test123.epub')
+
+def convert(url_path: str, original_path: str) -> str:
+    """ Return new file name"""
+    new_name = change_name(original_path)
+    converted_path = url_path.replace(os.path.split(url_path)[-1], new_name)
+    pypandoc.convert_file(url_path, 'epub', outputfile=converted_path)
+    return new_name
