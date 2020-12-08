@@ -3,10 +3,9 @@ import tempfile
 import urllib
 import urllib.parse
 import pypandoc
-from converter.app import flask_app
 
 
-def read_stream(path):
+def _read_stream(path):
     """Return stream for writing"""
     if isinstance(path, str):
         with urllib.request.urlopen(path) as file:
@@ -15,29 +14,28 @@ def read_stream(path):
         return path.stream.read()
 
 
-def create_epub(path_to_file: str) -> str:
+def convert_to_epub(path_to_file: str, output_format: str) -> str:
     """Creating epub file"""
-    with tempfile.NamedTemporaryFile(dir=flask_app.config['UPLOAD_FOLDER'], suffix='.md') as tmp:
-        tmp.write(read_stream(path_to_file))
+    with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
+        tmp.write(_read_stream(path_to_file))
         tmp.seek(0)
-        file_name = convert(tmp.name, path_to_file)
+        file_name = convert(tmp.name, path_to_file, output_format)
     return file_name
 
 
-def change_name(path_to_file):
+def _change_name(path_to_file, output_format):
     """Return original name of the file"""
     if isinstance(path_to_file, str):
         split_url = urllib.parse.urlsplit(path_to_file)
         origin_file_name = split_url.path.split('/')[-1]
-        return origin_file_name.replace(origin_file_name.split('.')[-1], 'epub')
     else:
-        or_file_name = os.path.split(path_to_file.filename)[-1]
-        return or_file_name.replace(or_file_name.split('.')[-1], 'epub')
+        origin_file_name = os.path.split(path_to_file.filename)[-1]
+    return origin_file_name.replace(origin_file_name.split('.')[-1], output_format)
 
 
-def convert(url_path: str, original_path: str) -> str:
+def convert(url_path: str, original_path: str, output_format) -> str:
     """ Return new file name"""
-    new_name = change_name(original_path)
+    new_name = _change_name(original_path, output_format)
     converted_path = url_path.replace(os.path.split(url_path)[-1], new_name)
-    pypandoc.convert_file(url_path, 'epub', outputfile=converted_path)
+    pypandoc.convert_file(url_path, output_format, outputfile=converted_path)
     return new_name
