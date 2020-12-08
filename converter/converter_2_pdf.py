@@ -14,7 +14,7 @@ def _read_stream(path):
         return path.stream.read()
 
 
-def convert_to_epub(path_to_file: str, output_format: str) -> str:
+def convert_to_user_format(path_to_file: str, output_format: str) -> str:
     """Creating epub file"""
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
         tmp.write(_read_stream(path_to_file))

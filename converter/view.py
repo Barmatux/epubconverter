@@ -1,7 +1,7 @@
 import io
 from converter.app import flask_app
 from flask import render_template, request, redirect, url_for, send_file
-from converter.converter_2_pdf import convert_to_epub
+from converter.converter_2_pdf import convert_to_user_format
 from converter.utils import allowed_file, get_mimetype
 import os
 
@@ -14,7 +14,7 @@ def upload_page():
         output_format = request.form.get('formatList')
         some_obj = file if file else url
         if allowed_file(some_obj) and some_obj:
-            file_name = convert_to_epub(some_obj, output_format)
+            file_name = convert_to_user_format(some_obj, output_format)
         else:
             return redirect('/exception')
         return redirect(url_for('uploaded_file', filename=file_name))
