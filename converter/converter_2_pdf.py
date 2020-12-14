@@ -2,7 +2,7 @@ import os
 import tempfile
 import urllib
 import urllib.parse
-import pypandoc
+from pypandoc import convert_file
 
 
 def _read_stream(path):
@@ -11,6 +11,7 @@ def _read_stream(path):
         with urllib.request.urlopen(path) as file:
             return file.read()
     else:
+        print(type(path))
         return path.stream.read()
 
 
@@ -23,7 +24,7 @@ def convert_to_user_format(path_to_file: str, output_format: str) -> str:
     return file_name
 
 
-def _change_name(path_to_file, output_format):
+def _change_name(path_to_file, output_format: str):
     """Return original name of the file"""
     if isinstance(path_to_file, str):
         split_url = urllib.parse.urlsplit(path_to_file)
@@ -33,9 +34,9 @@ def _change_name(path_to_file, output_format):
     return origin_file_name.replace(origin_file_name.split('.')[-1], output_format)
 
 
-def convert(url_path: str, original_path: str, output_format) -> str:
+def convert(url_path: str, original_path: str, output_format: str) -> str:
     """ Return new file name"""
     new_name = _change_name(original_path, output_format)
     converted_path = url_path.replace(os.path.split(url_path)[-1], new_name)
-    pypandoc.convert_file(url_path, output_format, outputfile=converted_path)
+    convert_file(url_path, output_format, outputfile=converted_path)
     return new_name
