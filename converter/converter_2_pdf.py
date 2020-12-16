@@ -3,7 +3,7 @@ import tempfile
 import urllib
 import urllib.parse
 from pypandoc import convert_file
-
+from typing import Optional
 
 def _read_stream(path):
     """Return stream for writing"""
@@ -11,7 +11,6 @@ def _read_stream(path):
         with urllib.request.urlopen(path) as file:
             return file.read()
     else:
-        print(type(path))
         return path.stream.read()
 
 
@@ -24,7 +23,7 @@ def convert_to_user_format(path_to_file: str, output_format: str) -> str:
     return file_name
 
 
-def _change_name(path_to_file, output_format: str):
+def _change_name(path_to_file: Optional, output_format: str):
     """Return original name of the file"""
     if isinstance(path_to_file, str):
         split_url = urllib.parse.urlsplit(path_to_file)

@@ -5,7 +5,6 @@ import shutil
 def install_pandoc():
     pandoc = shutil.which('pandoc')
     if pandoc:
-        print(f' Path to {pandoc}')
         return 1
     else:
         try:
