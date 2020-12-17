@@ -6,31 +6,32 @@ from converter.utils import allowed_file, get_mimetype
 class TestUtilModule(unittest.TestCase):
     def test_allowed_file_wrong_extension_url(self):
         params = ['test.epub', 'test1.doc', 'test2.test']
-        for i in params:
-            self.assertFalse(allowed_file(i), "extension is not allowed should return False")
+        for filename in params:
+            self.assertFalse(allowed_file(filename), "extension is not allowed should return False")
 
     def test_allowed_file_true_extension_url(self):
         params = ['test.md', 'test.rtf']
-        for i in params:
-            self.assertTrue(allowed_file(i), "extension is not allowed should return False")
+        for filename in params:
+            self.assertTrue(allowed_file(filename), "extension is not allowed should return False")
 
     def test_allowed_file_true_file_extension_(self):
         params = ['test.md', 'test.rtf']
-        for i in params:
+        for filename in params:
             mock = MagicMock()
-            mock.filename = i
-            self.assertTrue(allowed_file(mock), "File should be allowed but fail")
+            mock.filename = filename
+            self.assertTrue(allowed_file(mock), f"{filename} should be allowed but fail")
 
     def test_file_extension_invalid_file_extension(self):
         params = ['test.doc', 'test.pdf']
-        for i in params:
+        for filename in params:
             mock = MagicMock()
-            mock.filename = i
-            self.assertTrue(allowed_file(mock), "File should be allowed but fail")
+            mock.filename = filename
+            self.assertFalse(allowed_file(mock), f"{filename} is not allowed")
 
     def test_none_allowed_file(self):
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AttributeError) as e:
             allowed_file(None)
+        self.assertEqual(str(e.exception), "'NoneType' object has no attribute 'filename'")
 
     def test_extends_get_mimetype(self,):
         input_params = ['test.doc', 'test.md']
@@ -40,5 +41,6 @@ class TestUtilModule(unittest.TestCase):
             self.assertEqual(get_mimetype(in_param), out_param, msg)
 
     def test_get_mimetype_none(self):
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AttributeError) as e:
             get_mimetype(None)
+        self.assertEqual(str(e.exception), "'NoneType' object has no attribute 'split'")

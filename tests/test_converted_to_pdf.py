@@ -18,8 +18,12 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
         url = ['https://example.com/test', 'http://example.com/test/test#somtehing=1?']
         output_format = [None, 1]
         for ur, out_f in zip(url, output_format):
-            with self.assertRaises(TypeError):
+            with self.assertRaises(TypeError) as e:
                 _change_name(ur, out_f)
+            if out_f:
+                self.assertEqual(str(e.exception), f'replace() argument 2 must be str, not int')
+            else:
+                self.assertEqual(str(e.exception), f'replace() argument 2 must be str, not None')
 
     def test_file_change_name(self):
         mock_file = MagicMock()
