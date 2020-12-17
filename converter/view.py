@@ -29,7 +29,7 @@ def uploaded_file(filename):
         ret_data.write(f.read())
         ret_data.seek(0)
     os.remove(filename)
-    return send_file(ret_data, mimetype=mime_type, attachment_filename='uploaded_file')
+    return send_file(ret_data, mimetype=mime_type)
 
 
 @flask_app.route('/exception')
