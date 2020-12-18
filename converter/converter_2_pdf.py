@@ -5,6 +5,7 @@ import urllib.parse
 from pypandoc import convert_file
 from typing import Optional
 
+
 def _read_stream(path):
     """Return stream for writing"""
     if isinstance(path, str):
@@ -14,7 +15,7 @@ def _read_stream(path):
         return path.stream.read()
 
 
-def convert_to_user_format(path_to_file: str, output_format: str) -> str:
+def convert_to_user_format(path_to_file, output_format: str) -> str:
     """Creating epub file"""
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
         tmp.write(_read_stream(path_to_file))

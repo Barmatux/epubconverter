@@ -13,7 +13,7 @@ def upload_page():
         url = request.form.get('url')
         output_format = request.form.get('formatList')
         some_obj = file if file else url
-        if allowed_file(some_obj) and some_obj:
+        if some_obj is not None and allowed_file(some_obj) and some_obj:
             file_name = convert_to_user_format(some_obj, output_format)
         else:
             return redirect('/exception')

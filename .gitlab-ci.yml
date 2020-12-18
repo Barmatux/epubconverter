@@ -1,0 +1,13 @@
+image: "python:3.6"
+
+before_script:
+  - python --version
+  - pip install -r requirments.txt
+
+stages:
+  - test
+
+unittest:
+  stage: test
+  script:
+  - cd tests/; unittest -v

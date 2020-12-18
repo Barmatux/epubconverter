@@ -6,24 +6,13 @@ import io
 
 class TestConvertedToPdfFunctions(unittest.TestCase):
 
-    def test_change_name_url_input(self):
+    def test_change_name_file_from_url(self):
         url = ['https://example.com/test.md', 'http://example.ru/test/test.html']
         output_format = ['epub', 'rtf']
         expected = ['test.epub', 'test.rtf']
         for ur, out_f, exp in zip(url, output_format, expected):
             res = _change_name(ur, out_f)
             self.assertEqual(res, exp, f"Name should be {exp}, but got {res}")
-
-    def test_change_name_wrong_input(self):
-        url = ['https://example.com/test', 'http://example.com/test/test#somtehing=1?']
-        output_format = [None, 1]
-        for ur, out_f in zip(url, output_format):
-            with self.assertRaises(TypeError) as e:
-                _change_name(ur, out_f)
-            if out_f:
-                self.assertEqual(str(e.exception), f'replace() argument 2 must be str, not int')
-            else:
-                self.assertEqual(str(e.exception), f'replace() argument 2 must be str, not None')
 
     def test_file_change_name(self):
         mock_file = MagicMock()
@@ -49,17 +38,21 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
     @patch('converter.converter_2_pdf.convert')
     @patch('converter.converter_2_pdf._read_stream')
     def test_convert_to_user_format(self, mock_read_stream, mock_convert):
+        path_to_file = r'D:\test.md'
+        input_format = 'epub'
         mock_read_stream.return_value = b'some.txt'
         mock_convert.return_value = 'name.epub'
-        assert convert_to_user_format(r'D:\test.md', 'format') == 'name.epub'
+        assert convert_to_user_format(path_to_file, input_format) == 'name.epub'
         mock_read_stream.assert_called_once_with(r'D:\test.md')
-        mock_convert.assert_called_once()
+        mock_convert.assert_called_once_with('some_dir_name', path_to_file, input_format)
 
-    @patch('os.replace', return_value='result.epub')
     @patch('converter.converter_2_pdf.convert_file')
     @patch('converter.converter_2_pdf._change_name')
-    def test_convert(self, mock_change_name, mock_convert, mock_replace):
+    def test_convert(self, mock_change_name, mock_convert):
+        original_path = 'origin_path'
+        output_format = 'epub'
+        url_path = 'temp_path'
         mock_change_name.return_value = 'test.epub'
-        assert convert('some_path', 'new_path', 'epub') == 'test.epub'
-        mock_change_name.assert_called_once()
-        mock_convert.assert_called_once()
+        assert convert(url_path, original_path, output_format) == 'test.epub'
+        mock_change_name.assert_called_once_with(original_path, output_format)
+        mock_convert.assert_called_once_with(url_path, output_format, outputfile='test.epub')

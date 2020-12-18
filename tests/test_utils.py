@@ -5,7 +5,7 @@ from converter.utils import allowed_file, get_mimetype
 
 class TestUtilModule(unittest.TestCase):
     def test_allowed_file_wrong_extension_url(self):
-        params = ['test.epub', 'test1.doc', 'test2.test']
+        params = ['test.epub', 'test1.doc', 'test2.test', 'test']
         for filename in params:
             self.assertFalse(allowed_file(filename), "extension is not allowed should return False")
 
@@ -28,19 +28,9 @@ class TestUtilModule(unittest.TestCase):
             mock.filename = filename
             self.assertFalse(allowed_file(mock), f"{filename} is not allowed")
 
-    def test_none_allowed_file(self):
-        with self.assertRaises(AttributeError) as e:
-            allowed_file(None)
-        self.assertEqual(str(e.exception), "'NoneType' object has no attribute 'filename'")
-
     def test_extends_get_mimetype(self,):
         input_params = ['test.doc', 'test.md']
         output_params = ['doc', 'md']
         for in_param, out_param in zip(input_params, output_params):
             msg = f"Failing while getting mimetype of file. Expected {out_param}"
             self.assertEqual(get_mimetype(in_param), out_param, msg)
-
-    def test_get_mimetype_none(self):
-        with self.assertRaises(AttributeError) as e:
-            get_mimetype(None)
-        self.assertEqual(str(e.exception), "'NoneType' object has no attribute 'split'")
