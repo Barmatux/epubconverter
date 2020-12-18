@@ -5,38 +5,35 @@ import urllib.parse
 from pypandoc import convert_file
 
 
-def _read_stream(path):
-    """Return stream for writing"""
-    if isinstance(path, str):
-        with urllib.request.urlopen(path) as file:
-            return file.read()
-    else:
-        print(type(path))
-        return path.stream.read()
+def process_file(file) -> bytes:
+    return file.stream.read()
 
 
-def convert_to_user_format(path_to_file: str, output_format: str) -> str:
+def process_url(url: str) -> bytes:
+    with urllib.request.urlopen(url) as file:
+        return file.read()
+
+
+def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
     """Creating epub file"""
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
-        tmp.write(_read_stream(path_to_file))
+        tmp.write(bytes_stream)
         tmp.seek(0)
-        file_name = convert(tmp.name, path_to_file, output_format)
-    return file_name
+        convert(tmp.name, new_file_name)
+    return new_file_name
 
 
-def _change_name(path_to_file, output_format: str):
+def change_name(filename: str, output_format: str):
     """Return original name of the file"""
-    if isinstance(path_to_file, str):
-        split_url = urllib.parse.urlsplit(path_to_file)
+    if r'https:\\' or r'http:\\' in filename:
+        split_url = urllib.parse.urlsplit(filename)
         origin_file_name = split_url.path.split('/')[-1]
     else:
-        origin_file_name = os.path.split(path_to_file.filename)[-1]
+        origin_file_name = os.path.split(filename)[-1]
     return origin_file_name.replace(origin_file_name.split('.')[-1], output_format)
 
 
-def convert(url_path: str, original_path: str, output_format: str) -> str:
+def convert(path_to_file: str, new_file_name: str):
     """ Return new file name"""
-    new_name = _change_name(original_path, output_format)
-    converted_path = url_path.replace(os.path.split(url_path)[-1], new_name)
-    convert_file(url_path, output_format, outputfile=converted_path)
-    return new_name
+    converted_path = path_to_file.replace(os.path.split(path_to_file)[-1], new_file_name)
+    convert_file(path_to_file, new_file_name.split('.')[-1], outputfile=converted_path)
