@@ -35,9 +35,11 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
         self.assertEqual(_read_stream(test_url), 'ok')
         mock.assert_called_with(test_url)
 
+    @patch('tempfile.NamedTemporaryFile')
     @patch('converter.converter_2_pdf.convert')
     @patch('converter.converter_2_pdf._read_stream')
-    def test_convert_to_user_format(self, mock_read_stream, mock_convert):
+    def test_convert_to_user_format(self, mock_read_stream, mock_convert, mock_tmp):
+        mock_tmp.return_value.__enter__.return_value.name = 'some_dir_name'
         path_to_file = r'D:\test.md'
         input_format = 'epub'
         mock_read_stream.return_value = b'some.txt'
