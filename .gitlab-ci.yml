@@ -10,5 +10,4 @@ stages:
 unittest:
   stage: test
   script:
-  - cd tests/
-  - python -m unittest -v
+  - python -m unittest discover -v
