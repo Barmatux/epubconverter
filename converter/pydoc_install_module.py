@@ -1,15 +1,11 @@
-from pypandoc.pandoc_download import download_pandoc
 import shutil
+from pypandoc.pandoc_download import download_pandoc
 
 
 def install_pandoc():
     pandoc = shutil.which('pandoc')
-    if pandoc:
-        return 1
-    else:
+    if not pandoc:
         try:
             download_pandoc()
-            return 1
         except Exception as e:
             print(f'Can\'t install because of {e}')
-            return -1

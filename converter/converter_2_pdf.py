@@ -2,8 +2,9 @@ import os
 import tempfile
 import urllib
 import urllib.parse
-from pypandoc import convert_file
 from typing import Optional
+from pypandoc import convert_file
+
 
 
 def _read_stream(path):

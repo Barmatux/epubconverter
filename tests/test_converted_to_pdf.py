@@ -1,7 +1,8 @@
 import unittest
-from converter.converter_2_pdf import _change_name, _read_stream, convert_to_user_format, convert
 from unittest.mock import MagicMock, patch
 import io
+from converter.converter_2_pdf import _change_name, _read_stream, convert_to_user_format, convert
+
 
 
 class TestConvertedToPdfFunctions(unittest.TestCase):

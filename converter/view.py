@@ -1,9 +1,9 @@
 import io
-from converter.app import flask_app
+import os
 from flask import render_template, request, redirect, url_for, send_file
+from converter.app import flask_app
 from converter.converter_2_pdf import convert_to_user_format
 from converter.utils import allowed_file, get_mimetype
-import os
 
 
 @flask_app.route('/', methods=['GET', 'POST'])
