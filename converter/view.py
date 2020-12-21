@@ -1,6 +1,6 @@
 from converter.app import flask_app
 from flask import render_template, request, redirect, url_for, send_file
-from converter.converter_2_pdf import convert_to_user_format, change_name
+from converter.converter_2_pdf import convert_to_user_format
 from converter.utils import get_content, copy_file_and_remove
 
 

@@ -23,7 +23,7 @@ def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
     return new_file_name
 
 
-def change_name(filename: str, output_format: str):
+def generate_new_name(filename: str, output_format: str):
     """Return original name of the file"""
     if r'https:\\' or r'http:\\' in filename:
         split_url = urllib.parse.urlsplit(filename)

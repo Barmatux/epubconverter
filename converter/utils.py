@@ -2,7 +2,7 @@ import urllib.parse
 from flask import request, redirect
 import io
 import os
-from converter.converter_2_pdf import process_file, process_url, change_name
+from converter.converter_2_pdf import process_file, process_url, generate_new_name
 from werkzeug.utils import secure_filename
 
 
@@ -25,9 +25,9 @@ def get_content(flask_request: request) -> tuple[bytes, str]:
     output_format = flask_request.form.get('formatList')
     if file and allowed_file(file):
         file_name = secure_filename(file.filename)
-        return process_file(file), change_name(file_name, output_format)
+        return process_file(file), generate_new_name(file_name, output_format)
     elif url and allowed_file(url):
-        return process_url(url), change_name(url, output_format)
+        return process_url(url), generate_new_name(url, output_format)
     else:
         return redirect('/exception')
 
