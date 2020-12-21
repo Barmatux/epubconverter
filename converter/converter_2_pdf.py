@@ -6,7 +6,6 @@ from typing import Optional
 from pypandoc import convert_file
 
 
-
 def _read_stream(path):
     """Return stream for writing"""
     if isinstance(path, str):
