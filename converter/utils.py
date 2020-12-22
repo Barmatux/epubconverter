@@ -2,8 +2,8 @@ import urllib.parse
 from flask import request, redirect
 import io
 import os
-from converter.converter_2_pdf import process_file, process_url, generate_new_name
 from werkzeug.utils import secure_filename
+from converter.converter_2_pdf import process_file, process_url, generate_new_name
 
 
 def allowed_file(some_obj) -> bool:
@@ -15,7 +15,7 @@ def allowed_file(some_obj) -> bool:
         return '.' in some_obj.filename and some_obj.filename.split('.')[-1] in allowed_extensions
 
 
-def get_mimetype(filename: str) -> str:
+def _get_file_extension(filename: str) -> str:
     return filename.split('.')[-1]
 
 
@@ -33,10 +33,10 @@ def get_content(flask_request: request) -> tuple[bytes, str]:
 
 
 def copy_file_and_remove(filename: str) -> tuple:
-    mime_type = get_mimetype(filename)
+    mime_type = _get_file_extension(filename)
     ret_data = io.BytesIO()
     with open(filename, 'rb') as f:
         ret_data.write(f.read())
         ret_data.seek(0)
     os.remove(filename)
-    return mime_type, ret_data
+    return mime_type, ret_data.read()
