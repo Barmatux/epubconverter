@@ -15,11 +15,8 @@ def allowed_file(some_obj) -> bool:
         return '.' in some_obj.filename and some_obj.filename.split('.')[-1] in allowed_extensions
 
 
-def _get_file_extension(filename: str) -> str:
-    return filename.split('.')[-1]
-
-
 def get_content(flask_request: request) -> tuple[bytes, str]:
+    print(flask_request)
     file = flask_request.files.get('file')
     url = flask_request.form.get('url')
     output_format = flask_request.form.get('formatList')
@@ -32,11 +29,10 @@ def get_content(flask_request: request) -> tuple[bytes, str]:
         return redirect('/exception')
 
 
-def copy_file_and_remove(filename: str) -> tuple:
-    mime_type = _get_file_extension(filename)
-    ret_data = io.BytesIO()
+def copy_file_and_remove(filename: str):
+    file_like_object = io.BytesIO()
     with open(filename, 'rb') as f:
-        ret_data.write(f.read())
-        ret_data.seek(0)
+        file_like_object.write(f.read())
+        file_like_object.seek(0)
     os.remove(filename)
-    return mime_type, ret_data.read()
+    return file_like_object

@@ -1,4 +1,5 @@
 from converter.app import flask_app
+import mimetypes
 from flask import render_template, request, redirect, url_for, send_file
 from converter.converter_2_pdf import convert_to_user_format
 from converter.utils import get_content, copy_file_and_remove
@@ -15,8 +16,9 @@ def upload_page():
 
 @flask_app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    mime_type, return_data = copy_file_and_remove(filename)
-    return send_file(return_data, mimetype=mime_type)
+    mimetype, encoding = mimetypes.guess_type(filename)
+    return_data = copy_file_and_remove(filename)
+    return send_file(return_data, mimetype=mimetype)
 
 
 @flask_app.route('/exception')
