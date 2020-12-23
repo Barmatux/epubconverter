@@ -15,7 +15,7 @@ def allowed_file(some_obj) -> bool:
         return '.' in some_obj.filename and some_obj.filename.split('.')[-1] in allowed_extensions
 
 
-def get_content(flask_request: request) -> tuple[bytes, str]:
+def get_content(flask_request):
     file = flask_request.files.get('file')
     url = flask_request.form.get('url')
     output_format = flask_request.form.get('formatList')

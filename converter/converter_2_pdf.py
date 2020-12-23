@@ -18,7 +18,6 @@ def process_url(url: str) -> bytes:
 
 def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
     """Creating epub file"""
-    print(str(type(bytes_stream)))
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
         tmp.write(bytes_stream)
         tmp.seek(0)
