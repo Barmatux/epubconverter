@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 from converter.utils import allowed_file, copy_file_and_remove
 
 
-
 class TestUtilModule(unittest.TestCase):
 
     def test_allowed_file_wrong_extension_url(self):
@@ -46,4 +45,3 @@ class TestUtilModule(unittest.TestCase):
         self.assertEqual(copy_file_and_remove(filename), mock_bytes)
         mock_context.assert_called_once()
         mock_remove.assert_called_once_with(filename)
-
