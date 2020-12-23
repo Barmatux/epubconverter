@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import io
 from converter.converter_2_pdf import _generate_new_name, _read_stream, convert_to_user_format, convert
 
-
 class TestConvertedToPdfFunctions(unittest.TestCase):
 
     def test_generate_new_name_file_from_url(self):
