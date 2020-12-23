@@ -16,7 +16,6 @@ def allowed_file(some_obj) -> bool:
 
 
 def get_content(flask_request: request) -> tuple[bytes, str]:
-    print(flask_request)
     file = flask_request.files.get('file')
     url = flask_request.form.get('url')
     output_format = flask_request.form.get('formatList')

@@ -30,12 +30,6 @@ class TestUtilModule(unittest.TestCase):
             mock.filename = filename
             self.assertFalse(allowed_file(mock), f"{filename} is not allowed")
 
-    @patch('converter.converter_2_pdf.generate_new_name')
-    @patch('converter.converter_2_pdf.process_file')
-    @patch('flask.request')
-    def test_get_content(self, request_mock, process_mock, new_name_mock):
-        pass
-
     @patch('converter.utils.io.BytesIO')
     @patch('converter.utils.os.remove')
     @patch('converter.utils.open')
