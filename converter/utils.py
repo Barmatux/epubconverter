@@ -1,5 +1,5 @@
 import urllib.parse
-from flask import request, redirect
+from flask import redirect
 import io
 import os
 from werkzeug.utils import secure_filename
