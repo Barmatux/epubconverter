@@ -1,5 +1,5 @@
-from pypandoc.pandoc_download import download_pandoc
 import shutil
+from pypandoc.pandoc_download import download_pandoc
 
 
 def install_pandoc():
