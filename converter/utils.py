@@ -3,7 +3,7 @@ from flask import redirect
 import io
 import os
 from werkzeug.utils import secure_filename
-from converter.converter_2_pdf import process_file, process_url, generate_new_name
+from converter.converter_2_pdf import process_url, process_file, generate_new_name
 
 
 def allowed_file(some_obj) -> bool:
@@ -35,3 +35,7 @@ def copy_file_and_remove(filename: str):
         file_like_object.seek(0)
     os.remove(filename)
     return file_like_object
+
+
+if __name__ == '__main__':
+    print(dir())

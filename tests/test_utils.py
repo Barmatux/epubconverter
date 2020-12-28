@@ -1,7 +1,9 @@
 import unittest
 import io
 from unittest.mock import MagicMock, patch
-from converter.utils import allowed_file, copy_file_and_remove
+from werkzeug.test import EnvironBuilder
+from werkzeug.wrappers import Request
+from converter.utils import allowed_file, copy_file_and_remove, get_content
 
 
 class TestUtilModule(unittest.TestCase):
@@ -39,3 +41,41 @@ class TestUtilModule(unittest.TestCase):
         self.assertEqual(copy_file_and_remove(filename), mock_bytes)
         mock_context.assert_called_once()
         mock_remove.assert_called_once_with(filename)
+
+    @patch('converter.utils.generate_new_name')
+    @patch('converter.utils.process_file')
+    def test_get_content_file(self, mock_process, mock_gen_new_name):
+        builder = EnvironBuilder(method='POST',
+                                 data={
+                                     'formatList': 'epub',
+                                     'file': (io.BytesIO('my file contents'.encode("utf8")), 'test.md')
+                                      }
+                                 )
+        env = builder.get_environ()
+        req = Request(env)
+        mock_process.return_value = b'my file contents'
+        mock_gen_new_name.return_value = 'test.epub'
+        file = req.files.get('file')
+        self.assertEqual(get_content(req), (b'my file contents', 'test.epub'))
+        mock_process.assert_called_once_with(file)
+        mock_gen_new_name.assert_called_once_with(file.filename, req.form.get('formatList'))
+
+    @patch('converter.utils.allowed_file')
+    @patch('converter.utils.generate_new_name')
+    @patch('converter.utils.process_url')
+    def test_get_content_file(self, mock_process, mock_gen_new_name, mock_allowed):
+        builder = EnvironBuilder(method='POST',
+                                 data={
+                                     'formatList': 'epub',
+                                     'url': 'http:\\example.com'
+                                      }
+                                 )
+        env = builder.get_environ()
+        req = Request(env)
+        mock_process.return_value = r'http:\\example.com'
+        mock_gen_new_name.return_value = 'test.epub'
+        mock_allowed.return_value = True
+        url = req.form.get('url')
+        self.assertEqual(get_content(req), (r'http:\\example.com', 'test.epub'))
+        mock_process.assert_called_once_with(url)
+        mock_gen_new_name.assert_called_once_with(url, req.form.get('formatList'))
