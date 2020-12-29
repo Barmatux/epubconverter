@@ -8,7 +8,10 @@ from converter.utils import get_content, copy_file_and_remove
 @flask_app.route('/', methods=['GET', 'POST'])
 def upload_page():
     if request.method == 'POST':
-        some_obj, new_file_name = get_content(request)
+        try:
+            some_obj, new_file_name = get_content(request)
+        except TypeError:
+            return redirect(url_for('exception_page'))
         convert_to_user_format(some_obj, new_file_name)
         return redirect(url_for('uploaded_file', filename=new_file_name))
     return render_template('index.html')

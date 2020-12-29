@@ -5,15 +5,13 @@ import urllib.parse
 from pypandoc import convert_file
 
 
-def process_file(file) -> bytes:
-    """Stream from file"""
-    return file.stream.read()
-
-
-def process_url(url: str) -> bytes:
-    """Read from url file"""
-    with urllib.request.urlopen(url) as file:
-        return file.read()
+def process_content(file=None, url: str = None) -> bytes:
+    """read file"""
+    if file:
+        return file.stream.read()
+    else:
+        with urllib.request.urlopen(url) as file:
+            return file.read()
 
 
 def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
@@ -27,16 +25,18 @@ def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
 
 def generate_new_name(filename: str, output_format: str):
     """Return new name of the file"""
-    if r'https:\\' or r'http:\\' in filename:
+    if filename.startswith(r'https:\\') or filename.startswith(r'http:\\'):
         split_url = urllib.parse.urlsplit(filename)
         origin_file_name = split_url.path.split('/')[-1]
     else:
         origin_file_name = os.path.split(filename)[-1]
-    return origin_file_name.replace(origin_file_name.split('.')[-1], output_format)
+    return origin_file_name.replace(
+        origin_file_name.split('.')[-1], output_format)
 
 
 def convert(path_to_file: str, new_file_name: str):
     """ Convert file into epub format"""
-    converted_path = path_to_file.replace(os.path.split(path_to_file)[-1], new_file_name)
+    converted_path = path_to_file.replace(
+        os.path.split(path_to_file)[-1], new_file_name)
     extension = new_file_name.split('.')[-1]
     convert_file(path_to_file, extension, outputfile=converted_path)

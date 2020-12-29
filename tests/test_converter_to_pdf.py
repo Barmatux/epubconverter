@@ -1,21 +1,21 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import io
-from converter.converter_2_pdf import convert_to_user_format, convert, process_file, process_url, generate_new_name
+from converter.converter_2_pdf import convert_to_user_format, convert, process_content, generate_new_name
 
 
 class TestConvertedToPdfFunctions(unittest.TestCase):
 
-    def test_process_file(self):
+    def test_process_content_file(self):
         mock = MagicMock()
         mock.stream = io.BytesIO(b'ok')
-        self.assertEqual(process_file(mock), b'ok')
+        self.assertEqual(process_content(file=mock), b'ok')
 
     @patch('urllib.request.urlopen')
-    def test_process_url(self, mock):
+    def test_process_content_url_input(self, mock):
         mock.return_value.__enter__.return_value.read.return_value = 'ok'
         test_url = 'http:\\example.com'
-        self.assertEqual(process_url(test_url), 'ok')
+        self.assertEqual(process_content(url=test_url), 'ok')
         mock.assert_called_with(test_url)
 
     def test_generate_new_name_from_url(self):
