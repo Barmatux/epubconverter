@@ -42,9 +42,10 @@ class TestUtilModule(unittest.TestCase):
         mock_context.assert_called_once()
         mock_remove.assert_called_once_with(filename)
 
+    @patch('converter.utils.allowed_file')
     @patch('converter.utils.generate_new_name')
     @patch('converter.utils.process_file')
-    def test_get_content_file(self, mock_process, mock_gen_new_name):
+    def test_get_content_file(self, mock_process, mock_gen_new_name, mock_allowed_file):
         builder = EnvironBuilder(method='POST',
                                  data={
                                      'formatList': 'epub',
@@ -56,9 +57,11 @@ class TestUtilModule(unittest.TestCase):
         mock_process.return_value = b'my file contents'
         mock_gen_new_name.return_value = 'test.epub'
         file = req.files.get('file')
+        mock_allowed_file.return_value = True
         self.assertEqual(get_content(req), (b'my file contents', 'test.epub'))
         mock_process.assert_called_once_with(file)
         mock_gen_new_name.assert_called_once_with(file.filename, req.form.get('formatList'))
+        mock_allowed_file.assert_called_once_with(file)
 
     @patch('converter.utils.allowed_file')
     @patch('converter.utils.generate_new_name')
@@ -79,3 +82,4 @@ class TestUtilModule(unittest.TestCase):
         self.assertEqual(get_content(req), (r'http:\\example.com', 'test.epub'))
         mock_process.assert_called_once_with(url)
         mock_gen_new_name.assert_called_once_with(url, req.form.get('formatList'))
+        mock_allowed.assert_called_once_with(url)
