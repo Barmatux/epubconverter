@@ -40,7 +40,7 @@ class TestUtilModule(unittest.TestCase):
 
     @patch('converter.utils.allowed_file')
     @patch('converter.utils.generate_new_name')
-    @patch('converter.utils.process_object')
+    @patch('converter.utils.process_content')
     def test_get_content_file(self, mock_process, mock_gen_new_name, mock_allowed_file):
         builder = EnvironBuilder(method='POST',
                                  data={
@@ -62,7 +62,7 @@ class TestUtilModule(unittest.TestCase):
 
     @patch('converter.utils.allowed_file')
     @patch('converter.utils.generate_new_name')
-    @patch('converter.utils.process_object')
+    @patch('converter.utils.process_content')
     def test_get_content_url(self, mock_process, mock_gen_new_name, mock_allowed):
         builder = EnvironBuilder(method='POST',
                                  data={
