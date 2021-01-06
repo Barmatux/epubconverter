@@ -5,7 +5,7 @@ from urllib.parse import urlparse, urlsplit
 
 def get_file_name(url: str) -> str:
     url_schem = urlsplit(url)
-    delimetr = 'masters'
+    delimetr = 'master'
     if '.' in url_schem.path.split('/')[-1]:
         if 'main' in url_schem.path:
             delimetr = 'main'
