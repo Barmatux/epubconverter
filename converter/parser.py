@@ -30,3 +30,9 @@ def parse(url: str) -> Generator:
         elif file_content.path.endswith('.md') or \
                 file_content.path.endswith('.rtf'):
             yield file_content.download_url
+
+
+if __name__ == '__main__':
+    g = Github()
+    repo = g.get_repo('awsdocs/amazon-ec2-user-guide')
+    print(repo.downloads_url)
