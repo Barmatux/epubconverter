@@ -10,33 +10,33 @@ def process_content(file=None, url: str = None) -> bytes:
     if file:
         return file.stream.read()
     else:
-        with urllib.request.urlopen(url) as file:
-            return file.read()
+        with urllib.request.urlopen(url) as urlf:
+            return urlf.read()
 
 
-def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> str:
+def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> None:
     """Creating epub file"""
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
         tmp.write(bytes_stream)
         tmp.seek(0)
         convert(tmp.name, new_file_name)
-    return new_file_name
 
 
-def generate_new_name(filename: str, output_format: str):
+def generate_new_name(filename: str, output_format: str) -> str:
     """Return new name of the file"""
-    if filename.startswith(r'https:\\') or filename.startswith(r'http:\\'):
+    if filename.startswith(r'https://') or filename.startswith(r'http://'):
         split_url = urllib.parse.urlsplit(filename)
         origin_file_name = split_url.path.split('/')[-1]
     else:
         origin_file_name = os.path.split(filename)[-1]
-    return origin_file_name.replace(
-        origin_file_name.split('.')[-1], output_format)
+    if '.' in origin_file_name:
+        return origin_file_name.replace(
+            origin_file_name.split('.')[-1], output_format)
+    else:
+        return '.'.join((origin_file_name, output_format))
 
 
-def convert(path_to_file: str, new_file_name: str):
+def convert(path_to_file: str, new_file_name: str) -> None:
     """ Convert file into epub format"""
-    converted_path = path_to_file.replace(
-        os.path.split(path_to_file)[-1], new_file_name)
     extension = new_file_name.split('.')[-1]
-    convert_file(path_to_file, extension, outputfile=converted_path)
+    convert_file(path_to_file, extension, outputfile=new_file_name)

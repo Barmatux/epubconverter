@@ -1,38 +1,43 @@
-from typing import Generator
-from github import Github
-from urllib.parse import urlparse, urlsplit
+import io
+from pygit2 import clone_repository
+from pathlib import Path
+import tempfile
+import panflute
+from pypandoc import convert_file
+from converter.converter_2_pdf import convert
 
 
-def get_file_name(url: str) -> str:
-    url_schem = urlsplit(url)
-    delimetr = 'master'
-    if '.' in url_schem.path.split('/')[-1]:
-        if 'main' in url_schem.path:
-            delimetr = 'main'
-        path_to_file = urlsplit(url).path.split(delimetr)[-1]
-        return path_to_file.replace('/', '', 1)
-    else:
-        return ''
+def create_one_file_from_many(url: str, filename: str):
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        clone_repository(url, tmpdirname)
+        index_path = find_path_to_file(tmpdirname)
+        links_lst = create_book_tree(index_path)
+        create_and_convert(links_lst, tmpdirname, filename)
 
 
-def parse(url: str) -> Generator:
-    g = Github()
-    user_repo = urlparse(url).path.split('/')
-    repo = g.get_repo(f'{user_repo[1]}/{user_repo[2]}')
-    filename = get_file_name(url)
-    content = repo.get_contents(filename)
-    if filename:
-        yield content.download_url
-    while content and isinstance(content, list):
-        file_content = content.pop(0)
-        if file_content.type == 'dir':
-            content.extend(repo.get_contents(file_content.path))
-        elif file_content.path.endswith('.md') or \
-                file_content.path.endswith('.rtf'):
-            yield file_content.download_url
+def create_and_convert(links: list[panflute.Link], dirname: str, fname: str):
+    with tempfile.NamedTemporaryFile(mode='a+b', suffix='.md') as tmp:
+        for i in links:
+            path = find_path_to_file(dirname, i.url)
+            with open(path, 'rb') as f_r:
+                tmp.write(f_r.read())
+        convert(tmp.name, fname)
 
 
-if __name__ == '__main__':
-    g = Github()
-    repo = g.get_repo('awsdocs/amazon-ec2-user-guide')
-    print(repo.downloads_url)
+def create_book_tree(source: str) -> list[panflute.Link]:
+    data = convert_file(source, 'json')
+    doc = panflute.load(io.StringIO(data))
+    doc.links = []
+
+    def action(elem, doc):
+        if isinstance(elem, panflute.Link):
+            doc.links.append(elem)
+    doc = panflute.run_filter(action,  doc=doc)
+    return doc.links
+
+
+def find_path_to_file(dirname: str, filename='index.md') -> str:
+    p = None
+    for path in Path(dirname).rglob(filename):
+        p = path.absolute()
+    return p.as_posix()
