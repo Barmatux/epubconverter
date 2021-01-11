@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from pathlib import WindowsPath
+from pathlib import Path
 from panflute import Link, elements
 from converter.parser import find_path_to_file, create_one_file_from_many,\
     create_and_convert, create_book_tree
@@ -11,7 +11,7 @@ class TestParser(unittest.TestCase):
     @patch('converter.parser.Path.as_posix')
     @patch('converter.parser.Path.rglob')
     def test_find_path_to_file_default(self, mock_path, mock_as_posix):
-        mock_path.return_value = [WindowsPath('D:\\')]
+        mock_path.return_value = [Path('D:\\')]
         mock_as_posix.return_value = 'D:\\index.md'
         self.assertEqual(find_path_to_file('D:\\'), 'D:\\index.md')
         mock_path.assert_called_once()
