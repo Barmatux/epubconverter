@@ -20,7 +20,7 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
         mock.assert_called_with(test_url)
 
     def test_generate_new_name_from_url(self):
-        url = ['https://example.com/test.md',
+        url = ['httpds://example.com/test.md',
                'http://example.ru/test/test.html']
         output_format = ['epub', 'rtf']
         expected = ['test.epub', 'test.rtf']

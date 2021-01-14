@@ -3,6 +3,7 @@ import tempfile
 import urllib
 import urllib.parse
 from pypandoc import convert_file
+import re
 
 
 def process_content(file=None, url: str = None) -> bytes:
@@ -10,8 +11,8 @@ def process_content(file=None, url: str = None) -> bytes:
     if file:
         return file.stream.read()
     else:
-        with urllib.request.urlopen(url) as urlf:
-            return urlf.read()
+        with urllib.request.urlopen(url) as conn:
+            return conn.read()
 
 
 def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> None:
@@ -24,7 +25,7 @@ def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> None:
 
 def generate_new_name(filename: str, output_format: str) -> str:
     """Return new name of the file"""
-    if filename.startswith(r'https://') or filename.startswith(r'http://'):
+    if re.match(r'(https*://)', filename):
         split_url = urllib.parse.urlsplit(filename)
         origin_file_name = split_url.path.split('/')[-1]
     else:

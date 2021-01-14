@@ -2,6 +2,7 @@ from converter.app import flask_app
 import mimetypes
 from flask import render_template, request, redirect, url_for, send_file
 from converter.utils import get_content, copy_file_and_remove
+from pydoc_install_module import install_pandoc
 from utils import process_repo_url
 
 
@@ -33,3 +34,8 @@ def convert_repo_page():
 @flask_app.route('/exception')
 def exception_page():
     return "Something goes wrong"
+
+
+if __name__ == '__main__':
+    install_pandoc()
+    flask_app.run()
