@@ -1,5 +1,6 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+import os
 from pathlib import Path
 from panflute import Link, elements
 from converter.parser import find_path_to_chapter, prepare_book_chp,\
@@ -7,16 +8,17 @@ from converter.parser import find_path_to_chapter, prepare_book_chp,\
 
 
 class TestParser(unittest.TestCase):
-
-    @patch('converter.parser.Path.as_posix')
+    @patch('converter.parser.Path')
     @patch('converter.parser.Path.rglob')
-    def test_find_path_to_chapter_default(self, mock_path, mock_as_posix):
-        mock_path.return_value = [Path('D:\\')]
-        mock_as_posix.return_value = 'D:\\index.md'
-        self.assertEqual(find_path_to_chapter('D:\\', 'index.md'),
-                         'D:\\index.md')
-        mock_path.assert_called_once()
-        mock_as_posix.assert_called_once()
+    def test_find_path_to_chapter_default(self, mock_rglob, mock_path):
+        mock = Mock()
+        mock.absolute.return_value = os.path.join(os.getcwd(), 'index.md')
+        mock_rglob.return_value = [mock, ]
+        mock_path.return_value = Path()
+        self.assertEqual(find_path_to_chapter('some_path', 'index.md'),
+                         os.path.join(os.getcwd(), 'index.md'))
+        mock_rglob.assert_called_once_with('index.md')
+        mock_path.assert_called_once_with('some_path')
 
     @patch('tempfile.mkdtemp')
     @patch('converter.parser.create_chapters_lst')
@@ -25,8 +27,8 @@ class TestParser(unittest.TestCase):
     def test_prepare_book_chp(self, mock_clone_rp, mock_fpath,
                               mock_book_tree, mock_tempdir):
         mock_tempdir.return_value = 'some_dir_name'
-        mock_fpath.return_value = 'D:\\'
-        mock_book_tree.return_value = ['D:\\test\\test', ]
+        mock_fpath.return_value = 'some_path'
+        mock_book_tree.return_value = ['some_path', ]
         url = 'some_url'
         prepare_book_chp(url)
         mock_clone_rp.assert_called_once_with(url, mock_tempdir.return_value)

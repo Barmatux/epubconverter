@@ -24,7 +24,7 @@ def join_files(links: List[panflute.Link], dirname: str, fname: str):
             path = find_path_to_chapter(dirname, i.url)
             with open(path, 'rb') as f_r:
                 tmp.write(f_r.read())
-    convert(tmp.name, fname)
+        convert(tmp.name, fname)
 
 
 def create_chapters_lst(source: str) -> List[panflute.Link]:
@@ -45,4 +45,4 @@ def find_path_to_chapter(dirname: str, filename: str) -> str:
     abs_path = None
     for path in Path(dirname).rglob(filename):
         abs_path = path.absolute()
-    return abs_path.as_posix()
+    return str(abs_path)
