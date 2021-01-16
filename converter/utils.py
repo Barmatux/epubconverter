@@ -2,7 +2,7 @@ import io
 import os
 import urllib.parse
 from werkzeug.utils import secure_filename
-from converter.parser import create_one_file_from_many
+from converter.parser import prepare_book_chp, join_files
 from converter.converter_2_pdf import generate_new_name, process_content, \
     convert_to_user_format
 
@@ -27,7 +27,7 @@ def get_content(flask_request):
         return new_filename
 
 
-def copy_file_and_remove(filename: str) -> io.BytesIO:
+def copy_in_memory(filename: str) -> io.BytesIO:
     file_like_object = io.BytesIO()
     with open(filename, 'rb') as f:
         file_like_object.write(f.read())
@@ -40,5 +40,6 @@ def process_repo_url(flask_request):
     url = flask_request.form.get('url')
     output_format = flask_request.form.get('formatList')
     new_name = generate_new_name(url, output_format)
-    create_one_file_from_many(url, new_name)
+    chap_lst, tmpdir = prepare_book_chp(url)
+    join_files(chap_lst, tmpdir, new_name)
     return new_name

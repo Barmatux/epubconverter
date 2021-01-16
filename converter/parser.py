@@ -8,24 +8,27 @@ from pypandoc import convert_file
 from converter.converter_2_pdf import convert
 
 
-def create_one_file_from_many(url: str, filename: str):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        clone_repository(url, tmpdirname)
-        path_index_chap = find_path_to_chapter(tmpdirname)
-        links_lst = create_chapters_lst(path_index_chap)
-        create_and_convert(links_lst, tmpdirname, filename)
+def prepare_book_chp(url: str):
+    """Prepare all book chapters for joining"""
+    tmpdir = tempfile.mkdtemp()
+    clone_repository(url, tmpdir)
+    path_index_chap = find_path_to_chapter(tmpdir, 'index.md')
+    chap_lst = create_chapters_lst(path_index_chap)
+    return chap_lst, tmpdir
 
 
-def create_and_convert(links: List[panflute.Link], dirname: str, fname: str):
+def join_files(links: List[panflute.Link], dirname: str, fname: str):
+    """ Writing all files in one temp """
     with tempfile.NamedTemporaryFile(mode='a+b', suffix='.md') as tmp:
         for i in links:
             path = find_path_to_chapter(dirname, i.url)
             with open(path, 'rb') as f_r:
                 tmp.write(f_r.read())
-        convert(tmp.name, fname)
+    convert(tmp.name, fname)
 
 
 def create_chapters_lst(source: str) -> List[panflute.Link]:
+    """Find all links in source file and return list of links to chapters"""
     data = convert_file(source, 'json')
     doc = panflute.load(io.StringIO(data))
     doc.chapters = []
@@ -37,7 +40,8 @@ def create_chapters_lst(source: str) -> List[panflute.Link]:
     return doc.chapters
 
 
-def find_path_to_chapter(dirname: str, filename='index.md') -> str:
+def find_path_to_chapter(dirname: str, filename: str) -> str:
+    """Return path by filename """
     abs_path = None
     for path in Path(dirname).rglob(filename):
         abs_path = path.absolute()

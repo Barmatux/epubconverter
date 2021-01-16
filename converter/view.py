@@ -1,7 +1,7 @@
 from converter.app import flask_app
 import mimetypes
 from flask import render_template, request, redirect, url_for, send_file
-from converter.utils import get_content, copy_file_and_remove
+from converter.utils import get_content, copy_in_memory
 from pydoc_install_module import install_pandoc
 from utils import process_repo_url
 
@@ -19,7 +19,7 @@ def upload_page():
 @flask_app.route('/uploads/<filename>')
 def uploaded_file(filename):
     mimetype, encoding = mimetypes.guess_type(filename)
-    return_data = copy_file_and_remove(filename)
+    return_data = copy_in_memory(filename)
     return send_file(return_data, mimetype=mimetype)
 
 
