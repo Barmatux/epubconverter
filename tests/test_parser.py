@@ -6,17 +6,16 @@ from converter.parser import find_path_to_chapter, prepare_book_chp,\
 
 
 class TestParser(unittest.TestCase):
-    @patch('converter.parser.str')
     @patch('converter.parser.Path')
-    def test_find_path_to_chapter_default(self, mock_path, mock_str):
-        find_path_to_chapter('some_path', 'index.md')
+    def test_find_path_to_chapter_default(self, mock_path):
+        res_mock = mock_path.return_value.rglob.return_value. \
+            __next__.return_value.absolute.return_value
+        actual_result = find_path_to_chapter('some_path', 'index.md')
+        self.assertEqual(actual_result, str(res_mock))
         mock_path.assert_called_once_with('some_path')
         mock_path.return_value.rglob.assert_called_once_with('index.md')
-        mock_path.return_value.rglob.return_value.__next__.return_value.\
-            absolute.assert_called_once()
-        res_mock = mock_path.return_value.rglob.return_value.\
-            __next__.return_value.absolute.return_value
-        mock_str.assert_called_once_with(res_mock)
+        mock_path.return_value.rglob.return_value. \
+            __next__.return_value.absolute.assert_called_once()
 
     @patch('tempfile.mkdtemp')
     @patch('converter.parser.create_chapters_lst')
