@@ -42,7 +42,6 @@ def create_chapters_lst(source: str) -> List[panflute.Link]:
 
 def find_path_to_chapter(dirname: str, filename: str) -> str:
     """Return path by filename """
-    abs_path = None
-    for path in Path(dirname).rglob(filename):
-        abs_path = path.absolute()
+    abs_path = next(Path(dirname).rglob(filename))
+    abs_path = abs_path.absolute()
     return str(abs_path)

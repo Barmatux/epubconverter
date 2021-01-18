@@ -1,24 +1,22 @@
 import unittest
-from unittest.mock import patch, Mock
-import os
-from pathlib import Path
+from unittest.mock import patch
 from panflute import Link, elements
 from converter.parser import find_path_to_chapter, prepare_book_chp,\
     join_files, create_chapters_lst
 
 
 class TestParser(unittest.TestCase):
+    @patch('converter.parser.str')
     @patch('converter.parser.Path')
-    @patch('converter.parser.Path.rglob')
-    def test_find_path_to_chapter_default(self, mock_rglob, mock_path):
-        mock = Mock()
-        mock.absolute.return_value = os.path.join(os.getcwd(), 'index.md')
-        mock_rglob.return_value = [mock, ]
-        mock_path.return_value = Path()
-        self.assertEqual(find_path_to_chapter('some_path', 'index.md'),
-                         os.path.join(os.getcwd(), 'index.md'))
-        mock_rglob.assert_called_once_with('index.md')
+    def test_find_path_to_chapter_default(self, mock_path, mock_str):
+        find_path_to_chapter('some_path', 'index.md')
         mock_path.assert_called_once_with('some_path')
+        mock_path.return_value.rglob.assert_called_once_with('index.md')
+        mock_path.return_value.rglob.return_value.__next__.return_value.\
+            absolute.assert_called_once()
+        res_mock = mock_path.return_value.rglob.return_value.\
+            __next__.return_value.absolute.return_value
+        mock_str.assert_called_once_with(res_mock)
 
     @patch('tempfile.mkdtemp')
     @patch('converter.parser.create_chapters_lst')
