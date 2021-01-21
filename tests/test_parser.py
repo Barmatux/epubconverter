@@ -20,7 +20,7 @@ class TestParser(unittest.TestCase):
     @patch('tempfile.mkdtemp')
     @patch('converter.parser.create_chapters_lst')
     @patch('converter.parser.find_path_to_chapter')
-    @patch('converter.parser.clone_repository')
+    @patch('converter.parser.download_md_files')
     def test_prepare_book_chp(self, mock_clone_rp, mock_fpath,
                               mock_book_tree, mock_tempdir):
         mock_tempdir.return_value = 'some_dir_name'

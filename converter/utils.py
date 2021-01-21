@@ -3,7 +3,7 @@ import os
 import urllib.parse
 from werkzeug.utils import secure_filename
 from converter.parser import prepare_book_chp, join_files
-from converter.converter_2_pdf import generate_new_name, process_content, \
+from converter.converter_to_pdf import generate_new_name, process_content, \
     convert_to_user_format
 
 

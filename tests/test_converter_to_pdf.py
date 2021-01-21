@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import io
-from converter.converter_2_pdf import convert_to_user_format, convert, \
+from converter.converter_to_pdf import convert_to_user_format, convert, \
     process_content, generate_new_name
 
 
@@ -46,7 +46,7 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
             self.assertEqual(res, exp, f"Name should be {exp}, but got {res}")
 
     @patch('tempfile.NamedTemporaryFile')
-    @patch('converter.converter_2_pdf.convert')
+    @patch('converter.converter_to_pdf.convert')
     def test_convert_to_user_format(self, mock_convert, mock_tmp):
         mock_tmp.return_value.__enter__.return_value.name = 'some_dir_name'
         filename = 'test.epub'
@@ -55,7 +55,7 @@ class TestConvertedToPdfFunctions(unittest.TestCase):
         mock_convert.assert_called_once_with('some_dir_name', filename)
         mock_tmp.assert_called_once()
 
-    @patch('converter.converter_2_pdf.convert_file')
+    @patch('converter.converter_to_pdf.convert_file')
     def test_convert(self, mock_convert):
         url_path = 'temp_path'
         new_file_name = 'test.epub'

@@ -1,17 +1,19 @@
 import io
-from pygit2 import clone_repository
 from pathlib import Path
 import tempfile
 import panflute
 from typing import List
+import urllib.request
+import os
 from pypandoc import convert_file
-from converter.converter_2_pdf import convert
+from converter.converter_to_pdf import convert
+from github_client.github_client import ConvGitHub
 
 
 def prepare_book_chp(url: str):
     """Prepare all book chapters for joining"""
     tmpdir = tempfile.mkdtemp()
-    clone_repository(url, tmpdir)
+    download_md_files(url, tmpdir)
     path_index_chap = find_path_to_chapter(tmpdir, 'index.md')
     chap_lst = create_chapters_lst(path_index_chap)
     return chap_lst, tmpdir
@@ -45,3 +47,13 @@ def find_path_to_chapter(dirname: str, filename: str) -> str:
     abs_path = next(Path(dirname).rglob(filename))
     abs_path = abs_path.absolute()
     return str(abs_path)
+
+
+def download_md_files(url, path_on_disc):
+    g = ConvGitHub()
+    cont_lst = g.get_repo_content(url)
+    for i in cont_lst:
+        with urllib.request.urlopen(i.download_url) as conn:
+            path = os.path.join(path_on_disc, i.name)
+            with open(path, 'wb') as file:
+                file.write(conn.read())

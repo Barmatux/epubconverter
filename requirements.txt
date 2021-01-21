@@ -3,3 +3,4 @@ panflute~=2.0.5
 Flask~=1.1.2
 pygit2~=1.4.0
 pypandoc~=1.5
+requests~=2.25.0

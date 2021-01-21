@@ -10,16 +10,14 @@ def process_content(file=None, url: str = None) -> bytes:
     """read file"""
     if file:
         return file.stream.read()
-    else:
-        with urllib.request.urlopen(url) as conn:
-            return conn.read()
+    with urllib.request.urlopen(url) as conn:
+        return conn.read()
 
 
 def convert_to_user_format(bytes_stream: bytes, new_file_name: str) -> None:
     """Creating epub file"""
     with tempfile.NamedTemporaryFile(dir=os.getcwd(), suffix='.md') as tmp:
         tmp.write(bytes_stream)
-        tmp.seek(0)
         convert(tmp.name, new_file_name)
 
 
