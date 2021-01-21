@@ -1,10 +1,9 @@
-
 import requests
 import urllib.parse
 import re
 from typing import List, Dict, Union
-from github_client.content_file import Content
-from github_client.repository import Repository
+from converter.github_client.content_file import Content
+from converter.github_client.repository import Repository
 
 BASE_URL = 'https://api.github.com'
 
