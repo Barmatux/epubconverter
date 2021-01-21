@@ -5,13 +5,11 @@ from typing import List, Dict, Union
 from converter.github_client.content_file import Content
 from converter.github_client.repository import Repository
 
-BASE_URL = 'https://api.github.com'
-
 
 class ConvGitHub:
     def __init__(self,
                  token=None,
-                 base_url=BASE_URL):
+                 base_url='https://api.github.com'):
         self.headers = self._get_headers(token)
         self.base_url = base_url
 
@@ -58,25 +56,28 @@ class ConvGitHub:
             repos.extend(res.json())
         return [Repository(repo) for repo in repos]
 
-    def get_repo_content(self, url: str, path: str = None) -> List[Content]:
+    def get_content(self, url: str, path: str = '') \
+            -> Union[Content, List[Content]]:
         """Recursively find all files in a repository"""
-        if not path:
-            path = ''
         user_and_repo = self._get_user_and_repo(url)
         url_query = f'/repos/{user_and_repo}/contents/{path}'
         res_url = urllib.parse.urljoin(self.base_url, url_query)
-        content_lst = None
         resp = self._send_get_request(res_url)
-        res_lst = [Content(cont) for cont in resp]
-        # todo: spit function, make it more readable
-        while res_lst:
-            cont = res_lst.pop(0)
+        if isinstance(resp, list):
+            return self._get_all_repo_cont(url, resp)
+        return Content(resp)
+
+    def _get_all_repo_cont(self, url, resp):
+        cont_lst = [Content(file) for file in resp]
+        res_cont_lst = None
+        while cont_lst:
+            cont = cont_lst.pop(0)
             if cont.type == 'dir':
                 path = cont.name
-                res_lst.extend(self.get_repo_content(url, path))
+                cont_lst.extend(self.get_content(url, path))
             else:
-                if content_lst:
-                    content_lst.append(cont)
+                if res_cont_lst:
+                    res_cont_lst.append(cont)
                 else:
-                    content_lst = [cont]
-        return content_lst
+                    res_cont_lst = [cont]
+        return res_cont_lst

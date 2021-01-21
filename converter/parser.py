@@ -7,7 +7,7 @@ import urllib.request
 import os
 from pypandoc import convert_file
 from converter.converter_to_pdf import convert
-from converter.github_client.github_client_cls import ConvGitHub
+from converter.github_client.github_client_cls import ConvGitHub, Content
 
 
 def prepare_book_chp(url: str):
@@ -49,11 +49,21 @@ def find_path_to_chapter(dirname: str, filename: str) -> str:
     return str(abs_path)
 
 
-def download_md_files(url, path_on_disc):
+def download_md_files(url: str, path_on_disc: str) -> None:
     g = ConvGitHub()
-    cont_lst = g.get_repo_content(url)
-    for i in cont_lst:
-        with urllib.request.urlopen(i.download_url) as conn:
-            path = os.path.join(path_on_disc, i.name)
-            with open(path, 'wb') as file:
-                file.write(conn.read())
+    cont_lst = g.get_content(url)
+    index = g.get_content(url, 'doc_source/index.md')
+    path = download_file(index, path_on_disc)
+    chapter_lst = create_chapters_lst(path)
+    chapter_set = {link.url for link in chapter_lst}
+    for cont in cont_lst:
+        if cont.name in chapter_set:
+            download_file(cont, path_on_disc)
+
+
+def download_file(cont_file: Content, path_on_disc: str) -> str:
+    with urllib.request.urlopen(cont_file.download_url) as conn:
+        path = os.path.join(path_on_disc, cont_file.name)
+        with open(path, 'wb') as file:
+            file.write(conn.read())
+    return path
