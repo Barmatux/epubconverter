@@ -7,7 +7,7 @@ import urllib.request
 import os
 from pypandoc import convert_file
 from converter.converter_to_pdf import convert
-from github_client.github_client import ConvGitHub
+from github_client.github_client_cls import ConvGitHub
 
 
 def prepare_book_chp(url: str):
