@@ -54,14 +54,9 @@ def find_path_to_chapter(dirname: str, filename: str) -> str:
 def get_files(url: str, path_on_disc: str) -> None:
     """ Preparing for downloading needed files"""
     g = ConvGitHub()
-    cont_lst = g.get_content(url)
-    index = g.get_content(url, 'doc_source/index.md')
-    path = download_file(index, path_on_disc)
-    chapter_lst = create_chapters_lst(path)
-    chapter_set = {link.url for link in chapter_lst}
-    for cont in cont_lst:
-        if cont.name in chapter_set:
-            download_file(cont, path_on_disc)
+    repo_content = g.get_content(url, get_doc_source_root())
+    for cont in repo_content:
+        download_file(cont, path_on_disc)
 
 
 def download_file(cont_file: Content, path_on_disc: str) -> str:
@@ -71,3 +66,7 @@ def download_file(cont_file: Content, path_on_disc: str) -> str:
         with open(path, 'wb') as file:
             file.write(conn.read())
     return path
+
+
+def get_doc_source_root():
+    return 'doc_source'

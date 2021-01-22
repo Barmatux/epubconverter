@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from panflute import Link, elements
 from converter.parser import find_path_to_chapter, prepare_book_chp,\
-    join_files, create_chapters_lst
+    join_files, create_chapters_lst, get_files
 
 
 class TestParser(unittest.TestCase):
@@ -65,3 +65,14 @@ class TestParser(unittest.TestCase):
         mock_convert_fl.assert_called_once()
         mock_run_fltr.assert_called_once()
         mock_panflute_load.assert_called_once()
+
+    @patch('converter.parser.download_file')
+    @patch('converter.parser.ConvGitHub')
+    def test_get_files(self, mock_cls_inst, mock_download):
+        cont = MagicMock()
+        mock_cls_inst.return_value.get_content.return_value = [cont]
+
+        get_files('some_url', 'some_path')
+
+        mock_cls_inst.assert_called_once()
+        mock_download.assert_called_once_with(cont, 'some_path')
