@@ -13,17 +13,19 @@ from converter.github_client.github_client_cls import ConvGitHub, Content
 def prepare_book_chp(url: str):
     """Prepare all book chapters for joining"""
     tmpdir = tempfile.mkdtemp()
-    download_md_files(url, tmpdir)
+    get_files(url, tmpdir)
     path_index_chap = find_path_to_chapter(tmpdir, 'index.md')
     chap_lst = create_chapters_lst(path_index_chap)
+    chap_lst = [chp.url for chp in chap_lst]
+    chap_lst.insert(0, 'index.md')
     return chap_lst, tmpdir
 
 
-def join_files(links: List[panflute.Link], dirname: str, fname: str):
+def join_files(links: List[str], dirname: str, fname: str):
     """ Writing all files in one temp """
     with tempfile.NamedTemporaryFile(mode='a+b', suffix='.md') as tmp:
         for i in links:
-            path = find_path_to_chapter(dirname, i.url)
+            path = find_path_to_chapter(dirname, i)
             with open(path, 'rb') as f_r:
                 tmp.write(f_r.read())
         convert(tmp.name, fname)
@@ -49,7 +51,8 @@ def find_path_to_chapter(dirname: str, filename: str) -> str:
     return str(abs_path)
 
 
-def download_md_files(url: str, path_on_disc: str) -> None:
+def get_files(url: str, path_on_disc: str) -> None:
+    """ Preparing for downloading needed files"""
     g = ConvGitHub()
     cont_lst = g.get_content(url)
     index = g.get_content(url, 'doc_source/index.md')
@@ -62,6 +65,7 @@ def download_md_files(url: str, path_on_disc: str) -> None:
 
 
 def download_file(cont_file: Content, path_on_disc: str) -> str:
+    """Download files by links"""
     with urllib.request.urlopen(cont_file.download_url) as conn:
         path = os.path.join(path_on_disc, cont_file.name)
         with open(path, 'wb') as file:

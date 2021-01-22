@@ -20,15 +20,15 @@ class TestParser(unittest.TestCase):
     @patch('tempfile.mkdtemp')
     @patch('converter.parser.create_chapters_lst')
     @patch('converter.parser.find_path_to_chapter')
-    @patch('converter.parser.download_md_files')
-    def test_prepare_book_chp(self, mock_clone_rp, mock_fpath,
+    @patch('converter.parser.get_files')
+    def test_prepare_book_chp(self, mock_get_files, mock_fpath,
                               mock_book_tree, mock_tempdir):
         mock_tempdir.return_value = 'some_dir_name'
         mock_fpath.return_value = 'some_path'
-        mock_book_tree.return_value = ['some_path', ]
+        mock_book_tree.return_value = [Link(), Link()]
         url = 'some_url'
         prepare_book_chp(url)
-        mock_clone_rp.assert_called_once_with(url, mock_tempdir.return_value)
+        mock_get_files.assert_called_once_with(url, mock_tempdir.return_value)
         mock_tempdir.assert_called_once()
         mock_fpath.assert_called_once_with(mock_tempdir.return_value,
                                            'index.md')
@@ -41,7 +41,7 @@ class TestParser(unittest.TestCase):
     def test_join_files(self, mock_temp, mock_path_tfile,
                         mock_open, mock_convert):
         filename = 'test.epub'
-        links = [Link(), Link()]
+        links = ['link', 'link2']
         mock_temp.return_value.__enter__.return_value.name = 'some_file'
         temp_name = mock_temp.return_value.__enter__.return_value.name
         mock_path_tfile.return_value = ['first_file', 'second_file']
